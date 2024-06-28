@@ -1,0 +1,23 @@
+name: Install Cloudsmith CLI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  install-cloudsmith-cli:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Add Cloudsmith repository
+        run: |
+          sudo curl -1sLf 'https://dl.cloudsmith.io/public/cloudsmith/setup.deb.sh' | sudo -E bash
+          sudo apt-get update
+
+      - name: Install Cloudsmith CLI
+        run: |
+          sudo apt-get install -y cloudsmith-cli
