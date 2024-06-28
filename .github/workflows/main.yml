@@ -1,0 +1,39 @@
+name: Build and Publish Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel
+
+    - name: Create package
+      run: |
+        python setup.py sdist bdist_wheel
+
+    - name: Install Cloudsmith CLI
+      run: |
+        curl -1sLf 'https://dl.cloudsmith.io/public/cloudsmith/cli/setup.sh' | sudo -E bash
+        sudo apt-get install cloudsmith-cli
+
+    - name: Upload package to Cloudsmith
+      env:
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+      run: |
+        cloudsmith push python your-org-name/your-repo-name dist/*.tar.gz
